@@ -2,38 +2,45 @@ name: Build Android APK
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+
   workflow_dispatch:
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Install Flet
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet
 
-    - name: Install Flet
-      run: pip install "flet[all]"
+      - name: Install Project Requirements
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
 
-    - name: Build APK
-      run: echo "y" | flet build apk
+      - name: Build APK
+        run: |
+          yes y | flet build apk
 
-    - name: Find APK
-      run: find . -name "*.apk" 2>/dev/null
+      - name: Show APK Files
+        run: |
+          find . -name "*.apk" 2>/dev/null
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: Tasbih-App-APK
-        path: build/
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tasbih-App
+          path: build/apk/Tasbih-App.apk

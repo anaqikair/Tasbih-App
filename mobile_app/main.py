@@ -42,10 +42,6 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = BG_COLOR
     
-    # Haptic Feedback (Crucial for mobile! Replaces Windows audio)
-    hf = ft.HapticFeedback()
-    page.overlay.append(hf)
-    
     today_str = date.today().isoformat()
     user_data = load_data()
     
@@ -109,7 +105,6 @@ def main(page: ft.Page):
         nonlocal streak_count
         reached_count = (today_count == DAILY_GOAL_COUNT)
         if reached_count:
-            hf.heavy_impact() # Big vibration for goal
             last_streak = user_data.get("last_streak_date")
             if last_streak != today_str: 
                 streak_count += 1
@@ -124,8 +119,6 @@ def main(page: ft.Page):
         today_count += 1
         total_count += 1
         last_click_time = time.time()
-        
-        hf.light_impact() # Light tap vibration
         
         user_data["history"][today_str] = today_count
         user_data["today_count"] = today_count
@@ -360,7 +353,6 @@ def main(page: ft.Page):
                 
                 if today_time_seconds == DAILY_GOAL_MINS * 60 and not time_goal_reached_today:
                     time_goal_reached_today = True
-                    hf.heavy_impact() # Big vibration instead of bell
                     page.snack_bar = ft.SnackBar(ft.Text("🎉 Time Goal Reached!", color=BG_COLOR, weight=ft.FontWeight.BOLD), bgcolor=PRIMARY_COLOR)
                     page.snack_bar.open = True
                     needs_update = True
@@ -378,7 +370,6 @@ def main(page: ft.Page):
                 
                 if general_timer_left == 0:
                     general_timer_running = False
-                    hf.heavy_impact() # Big vibration instead of bell
                     if timer_view.visible:
                         timer_btn.text = "Done"
                         timer_btn.icon = ft.Icons.CHECK
